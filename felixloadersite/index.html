@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Felix Lua Loader</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Felix Lua Loader</div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#usage">Usage</a></li>
+                <li><a href="#github" class="btn-github">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Felix Lua Loader</h1>
+            <p>Fast & Simple Lua Script Loader with ValeoHook Integration</p>
+            <a href="#github" class="btn btn-primary">Get Started</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>⚡ Fast Loading</h3>
+                    <p>Efficiently loads and executes Lua scripts with minimal overhead</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 ValeoHook Support</h3>
+                    <p>Built-in integration with ValeoHook for seamless compatibility</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📦 Lightweight</h3>
+                    <p>Minimal dependencies - just HTML, CSS, and JavaScript</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔧 Easy to Use</h3>
+                    <p>Simple API for loading scripts - get started in minutes</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Usage Section -->
+    <section id="usage" class="usage">
+        <div class="container">
+            <h2>Quick Start</h2>
+            <div class="code-block">
+                <pre><code>-- Basic usage
+local loader = require("felix_lua_loader")
+loader:loadScript("ValeoHook")</code></pre>
+                <button class="copy-btn" onclick="copyCode()">Copy</button>
+            </div>
+            <p class="usage-text">That's it! Your script is now loaded and ready to use.</p>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="installation">
+        <div class="container">
+            <h2>Installation</h2>
+            <ol class="install-steps">
+                <li>Clone the repository from GitHub</li>
+                <li>Download the Felix Lua Loader files</li>
+                <li>Include it in your project</li>
+                <li>Start loading scripts!</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Felix Lua Loader. All rights reserved.</p>
+            <a href="#github" id="github" class="github-link">View on GitHub →</a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
