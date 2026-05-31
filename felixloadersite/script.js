@@ -29,4 +29,4 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Update GitHub link with your actual repo
-document.getElementById('github').href = 'https://github.com/YOUR_USERNAME/felix-lua-loader';
+document.getElementById('github').href = 'https://github.com/XPY-UX/felix-luaLoader';
