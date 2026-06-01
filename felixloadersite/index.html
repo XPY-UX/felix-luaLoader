@@ -3,91 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Felix Lua Loader</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Felix Lua Loader — Fast & Simple Script Loading</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-main: #0a0a0c;
+            --bg-card: #121215;
+            --bg-code: #16161a;
+            --border: #232329;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        .btn-github {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-github:hover {
+            background-color: var(--border);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .badge {
+            background: var(--accent-glow);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.06em;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to bottom right, #ffffff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2.5rem auto;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 4rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Code/Preview Window */
+        .preview-window {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+
+        .window-header {
+            background-color: var(--bg-card);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #333;
+        }
+        .dot.red { background-color: #ef4444; }
+        .dot.yellow { background-color: #f59e0b; }
+        .dot.green { background-color: #10b981; }
+
+        .window-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-left: 1rem;
+            font-family: monospace;
+        }
+
+        .window-body {
+            padding: 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            color: #a78bfa; /* Lua syntax look */
+            overflow-x: auto;
+        }
+
+        .window-body comment { color: #4b5563; }
+        .window-body keyword { color: #f43f5e; }
+        .window-body string { color: #10b981; }
+
+        /* Features Section */
+        .features-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 8px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .icon-wrapper {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border);
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            color: var(--accent);
+            font-size: 1.25rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="logo">Felix Lua Loader</div>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#usage">Usage</a></li>
-                <li><a href="#github" class="btn-github">GitHub</a></li>
-            </ul>
+
+    <nav>
+        <div class="logo">
+            <i class="ph-bold ph-terminal-window"></i> Felix Lua Loader
         </div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#usage">Usage</a></li>
+            <li>
+                <button class="btn-github">
+                    <i class="ph ph-github-logo"></i> GitHub
+                </button>
+            </li>
+        </ul>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <h1>Felix Lua Loader</h1>
-            <p>Fast & Simple Lua Script Loader with ValeoHook Integration</p>
-            <a href="#github" class="btn btn-primary">Get Started</a>
+        <div class="badge">
+            <i class="ph-fill ph-sparkle"></i> ValeoHook Integration Ready
         </div>
-    </section>
+        <h1>Fast & Simple Lua Script Loader</h1>
+        <p>Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.</p>
+        
+        <div class="cta-group">
+            <button class="btn-primary">Get Started</button>
+            <button class="btn-github"><i class="ph ph-book-open"></i> Documentation</button>
+        </div>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="container">
-            <h2>Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h3>⚡ Fast Loading</h3>
-                    <p>Efficiently loads and executes Lua scripts with minimal overhead</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🎯 ValeoHook Support</h3>
-                    <p>Built-in integration with ValeoHook for seamless compatibility</p>
-                </div>
-                <div class="feature-card">
-                    <h3>📦 Lightweight</h3>
-                    <p>Minimal dependencies - just HTML, CSS, and JavaScript</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🔧 Easy to Use</h3>
-                    <p>Simple API for loading scripts - get started in minutes</p>
-                </div>
+        <div class="preview-window">
+            <div class="window-header">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+                <div class="window-title">example_init.lua</div>
+            </div>
+            <div class="window-body">
+                <comment>-- Initialize the Felix Loader environment</comment><br>
+                <keyword>local</keyword> loader = require(<string>"felix_loader"</string>)<br><br>
+                
+                <keyword>if</keyword> loader.connect_valeo() <keyword>then</keyword><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;loader.execute(<string>"scripts/main.lua"</string>)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;print(<string>"[Felix] Environment loaded gracefully."</string>)<br>
+                <keyword>end</keyword>
             </div>
         </div>
     </section>
 
-    <!-- Usage Section -->
-    <section id="usage" class="usage">
-        <div class="container">
-            <h2>Quick Start</h2>
-            <div class="code-block">
-                <pre><code>-- Basic usage
-local loader = require("felix_lua_loader")
-loader:loadScript("ValeoHook")</code></pre>
-                <button class="copy-btn" onclick="copyCode()">Copy</button>
+    <section class="features-section" id="features">
+        <h2 class="section-title">Engineered for Performance</h2>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <i class="ph-bold ph-lightning"></i>
+                </div>
+                <h3>Fast Loading</h3>
+                <p>Efficiently handles multi-threaded scripting states to achieve lightning-fast executions with minimal baseline memory footprint.</p>
             </div>
-            <p class="usage-text">That's it! Your script is now loaded and ready to use.</p>
+
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <i class="ph-bold ph-link-simple"></i>
+                </div>
+                <h3>ValeoHook Support</h3>
+                <p>Built-in dynamic linking layer designed explicitly for ValeoHook integration, giving you flawless memory hooks right out of the box.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <i class="ph-bold ph-feather"></i>
+                </div>
+                <h3>Ultra Lightweight</h3>
+                <p>Zero bloat philosophy. Standard integration patterns use native architecture handles without forcing heavy external dependencies.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <i class="ph-bold ph-code"></i>
+                </div>
+                <h3>Developer First API</h3>
+                <p>Simple, well-documented initialization sequences mean you spend less time configuring boilerplate and more time writing logic.</p>
+            </div>
         </div>
     </section>
 
-    <!-- Installation Section -->
-    <section class="installation">
-        <div class="container">
-            <h2>Installation</h2>
-            <ol class="install-steps">
-                <li>Clone the repository from GitHub</li>
-                <li>Download the Felix Lua Loader files</li>
-                <li>Include it in your project</li>
-                <li>Start loading scripts!</li>
-            </ol>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Felix Lua Loader. All rights reserved.</p>
-            <a href="#github" id="github" class="github-link">View on GitHub →</a>
-        </div>
+    <footer>
+        <p>&copy; 2026 Felix Lua Loader. Released under the MIT License.</p>
     </footer>
 
-    <script src="script.js"></script>
 </body>
 </html>
