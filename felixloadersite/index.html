@@ -16,6 +16,7 @@
             --accent: #3b82f6;
             --accent-hover: #2563eb;
             --accent-glow: rgba(59, 130, 246, 0.15);
+            --success: #10b981;
         }
 
         * {
@@ -85,11 +86,13 @@
             align-items: center;
             gap: 0.5rem;
             cursor: pointer;
-            transition: background-color 0.2s;
+            text-decoration: none;
+            transition: background-color 0.2s, border-color 0.2s;
         }
 
         .btn-github:hover {
             background-color: var(--border);
+            border-color: var(--text-muted);
         }
 
         /* Hero Section */
@@ -149,11 +152,18 @@
             font-weight: 500;
             font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s, transform 0.1s;
         }
 
         .btn-primary:hover {
             background-color: var(--accent-hover);
+        }
+
+        .btn-primary.copied {
+            background-color: var(--success);
         }
 
         /* Code/Preview Window */
@@ -161,7 +171,7 @@
             background-color: var(--bg-code);
             border: 1px solid var(--border);
             border-radius: 8px;
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
             text-align: left;
             box-shadow: 0 20px 40px rgba(0,0,0,0.4);
@@ -197,14 +207,15 @@
         .window-body {
             padding: 1.5rem;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.95rem;
-            color: #a78bfa; /* Lua syntax look */
+            font-size: 0.9rem;
+            color: #f43f5e; /* Default string/method colors */
             overflow-x: auto;
+            white-space: nowrap;
         }
 
-        .window-body comment { color: #4b5563; }
-        .window-body keyword { color: #f43f5e; }
-        .window-body string { color: #10b981; }
+        .window-body .keyword { color: #f43f5e; }
+        .window-body .method { color: #a78bfa; }
+        .window-body .string { color: #10b981; }
 
         /* Features Section */
         .features-section {
@@ -290,11 +301,10 @@
         </div>
         <ul class="nav-links">
             <li><a href="#features">Features</a></li>
-            <li><a href="#usage">Usage</a></li>
             <li>
-                <button class="btn-github">
+                <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github">
                     <i class="ph ph-github-logo"></i> GitHub
-                </button>
+                </a>
             </li>
         </ul>
     </nav>
@@ -307,8 +317,12 @@
         <p>Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.</p>
         
         <div class="cta-group">
-            <button class="btn-primary">Get Started</button>
-            <button class="btn-github"><i class="ph ph-book-open"></i> Documentation</button>
+            <button class="btn-primary" id="copyBtn" onclick="copyLoadstring()">
+                <i class="ph ph-copy" id="btnIcon"></i> <span id="btnText">Copy Loadstring</span>
+            </button>
+            <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github">
+                <i class="ph ph-book-open"></i> Documentation
+            </a>
         </div>
 
         <div class="preview-window">
@@ -316,16 +330,10 @@
                 <div class="dot red"></div>
                 <div class="dot yellow"></div>
                 <div class="dot green"></div>
-                <div class="window-title">example_init.lua</div>
+                <div class="window-title">environment_exec.lua</div>
             </div>
             <div class="window-body">
-                <comment>-- Initialize the Felix Loader environment</comment><br>
-                <keyword>local</keyword> loader = require(<string>"felix_loader"</string>)<br><br>
-                
-                <keyword>if</keyword> loader.connect_valeo() <keyword>then</keyword><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;loader.execute(<string>"scripts/main.lua"</string>)<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;print(<string>"[Felix] Environment loaded gracefully."</string>)<br>
-                <keyword>end</keyword>
+                <span class="keyword">loadstring</span>(<span class="method">game</span>:<span class="method">HttpGet</span>(<span class="string">"https://raw.githubusercontent.com/XPY-UX/felix-luaLoader/refs/heads/main/main/refs/loader.luau/loader.lua"</span>,<span class="keyword">true</span>))()
             </div>
         </div>
     </section>
@@ -371,6 +379,32 @@
     <footer>
         <p>&copy; 2026 Felix Lua Loader. Released under the MIT License.</p>
     </footer>
+
+    <script>
+        function copyLoadstring() {
+            const loadstringText = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/XPY-UX/felix-luaLoader/refs/heads/main/main/refs/loader.luau/loader.lua",true))()';
+            
+            navigator.clipboard.writeText(loadstringText).then(() => {
+                const copyBtn = document.getElementById('copyBtn');
+                const btnText = document.getElementById('btnText');
+                const btnIcon = document.getElementById('btnIcon');
+
+                // Visual updates on success
+                copyBtn.classList.add('copied');
+                btnText.innerText = 'Copied!';
+                btnIcon.className = 'ph-bold ph-check';
+
+                // Reset back to original state after 2 seconds
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    btnText.innerText = 'Copy Loadstring';
+                    btnIcon.className = 'ph ph-copy';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy code: ', err);
+            });
+        }
+    </script>
 
 </body>
 </html>
