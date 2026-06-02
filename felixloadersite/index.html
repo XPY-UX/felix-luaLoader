@@ -64,6 +64,9 @@
             background-image: 
                 radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.18) 0%, transparent 50%),
                 radial-gradient(circle at 0% 40%, rgba(16, 185, 129, 0.03) 0%, transparent 30%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Frosted Header Navigation */
@@ -106,20 +109,24 @@
 
         .nav-links {
             display: flex;
-            gap: 2.5rem;
+            gap: 2rem;
             align-items: center;
             list-style: none;
         }
 
-        .nav-links a {
+        .nav-links button, .nav-links a {
+            background: none;
+            border: none;
             color: var(--text-muted);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-sans);
             transition: color 0.2s ease;
         }
 
-        .nav-links a:hover {
+        .nav-links button:hover, .nav-links a:hover, .nav-links button.active {
             color: var(--accent-hover);
         }
 
@@ -146,11 +153,23 @@
             transform: translateY(-2px);
         }
 
-        /* Hero Section */
+        main {
+            flex: 1;
+        }
+
+        /* Page Content Views Control */
+        .page-view {
+            display: none;
+        }
+        .page-view.active-view {
+            display: block;
+        }
+
+        /* Hero Common Structure */
         .hero {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 8rem 2rem 6rem 2rem;
+            padding: 6rem 2rem 4rem 2rem;
             text-align: center;
         }
 
@@ -187,7 +206,6 @@
             color: var(--text-muted);
             max-width: 680px;
             margin: 0 auto 3.5rem auto;
-            font-weight: 400;
         }
 
         .cta-group {
@@ -224,6 +242,63 @@
             box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
         }
 
+        /* Generator Page Specific Form Elements */
+        .form-container {
+            max-width: 850px;
+            margin: 0 auto 3rem auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: 16px;
+            text-align: left;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0.02em;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1.25rem;
+            color: #475569;
+            font-size: 1.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            padding: 1rem 1.25rem 1rem 3.2rem;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+        }
+
         /* Premium Floating Terminal Window */
         .preview-window {
             background-color: var(--bg-code);
@@ -242,9 +317,6 @@
         .preview-window:hover {
             border-color: rgba(59, 130, 246, 0.4);
             transform: scale(1.01);
-            box-shadow: 
-                0 35px 70px -10px rgba(0,0,0,0.9),
-                0 0 60px -5px rgba(59, 130, 246, 0.15);
         }
 
         .window-header {
@@ -304,7 +376,7 @@
         .token.string { color: #4ade80; }
         .token.punctuation { color: #64748b; }
 
-        /* Modern Glassmorphic Features Section */
+        /* Features Section */
         .features-section {
             max-width: 1200px;
             margin: 0 auto;
@@ -366,7 +438,6 @@
             color: white;
             border-color: var(--accent);
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-            transform: scale(1.05);
         }
 
         .feature-card h3 {
@@ -398,8 +469,8 @@
             .hero h1 { font-size: 3rem; }
             .hero p { font-size: 1.15rem; }
             .nav-links { display: none; }
-            .hero { padding-top: 5rem; }
             .window-action-tip { display: none; }
+            .form-container { padding: 1.5rem; }
         }
     </style>
 </head>
@@ -411,7 +482,8 @@
                 <i class="ph-bold ph-terminal-window"></i> Felix Lua Loader
             </div>
             <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
+                <li><button id="navHome" class="active" onclick="switchPage('home')">Home</button></li>
+                <li><button id="navMaker" onclick="switchPage('maker')">Loadstring Maker</button></li>
                 <li>
                     <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github" aria-label="GitHub Repository">
                         <i class="ph ph-github-logo"></i> GitHub
@@ -422,75 +494,110 @@
     </header>
 
     <main>
-        <section class="hero" aria-label="Product Showcase">
-            <div class="badge">
-                <i class="ph-fill ph-sparkle"></i> ValeoHook Integration Ready
-            </div>
-            <h1>Fast & Simple Lua Script Loader</h1>
-            <p>Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.</p>
-            
-            <div class="cta-group">
-                <button class="btn-primary" id="copyBtn" onclick="copyLoadstring()" aria-live="polite">
-                    <i class="ph ph-copy" id="btnIcon"></i> <span id="btnText">Copy Loadstring</span>
-                </button>
-                <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github">
-                    <i class="ph ph-book-open"></i> Documentation
-                </a>
-            </div>
-
-            <div class="preview-window">
-                <div class="window-header">
-                    <div class="window-controls">
-                        <div class="dot red"></div>
-                        <div class="dot yellow"></div>
-                        <div class="dot green"></div>
-                        <span class="window-title" style="margin-left: 0.85rem;">environment_exec.lua</span>
-                    </div>
-                    <span class="window-action-tip"><i class="ph ph-cursor-click"></i> Click block to copy</span>
+        <div id="pageHome" class="page-view active-view">
+            <section class="hero" aria-label="Product Showcase">
+                <div class="badge">
+                    <i class="ph-fill ph-sparkle"></i> ValeoHook Integration Ready
                 </div>
-                <div class="window-body" id="codeBlock" onclick="copyLoadstring()" title="Click to copy script">
-                    <code><span class="token keyword">loadstring</span><span class="token punctuation">(</span><span class="token method">game</span><span class="token punctuation">:</span><span class="token method">HttpGet</span><span class="token punctuation">(</span><span class="token string">"https://raw.githubusercontent.com/XPY-UX/felix-luaLoader/refs/heads/main/main/refs/loader.luau/loader.lua"</span><span class="token punctuation">,</span><span class="token keyword">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>
+                <h1>Fast & Simple Lua Script Loader</h1>
+                <p>Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.</p>
+                
+                <div class="cta-group">
+                    <button class="btn-primary" id="copyBtn" onclick="copyStaticLoadstring()" aria-live="polite">
+                        <i class="ph ph-copy" id="btnIcon"></i> <span id="btnText">Copy Loadstring</span>
+                    </button>
+                    <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github">
+                        <i class="ph ph-book-open"></i> Documentation
+                    </a>
                 </div>
-            </div>
-        </section>
 
-        <section class="features-section" id="features" aria-labelledby="features-heading">
-            <h2 class="section-title" id="features-heading">Engineered for Performance</h2>
-            
-            <div class="features-grid">
-                <article class="feature-card">
-                    <div class="icon-wrapper">
-                        <i class="ph-bold ph-lightning"></i>
+                <div class="preview-window">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                            <span class="window-title" style="margin-left: 0.85rem;">environment_exec.lua</span>
+                        </div>
+                        <span class="window-action-tip"><i class="ph ph-cursor-click"></i> Click block to copy</span>
                     </div>
-                    <h3>Fast Loading</h3>
-                    <p>Efficiently handles multi-threaded scripting states to achieve lightning-fast executions with minimal baseline memory footprint.</p>
-                </article>
+                    <div class="window-body" onclick="copyStaticLoadstring()" title="Click to copy script">
+                        <code><span class="token keyword">loadstring</span><span class="token punctuation">(</span><span class="token method">game</span><span class="token punctuation">:</span><span class="token method">HttpGet</span><span class="token punctuation">(</span><span class="token string">"https://raw.githubusercontent.com/XPY-UX/felix-luaLoader/refs/heads/main/main/refs/loader.luau/loader.lua"</span><span class="token punctuation">,</span><span class="token keyword">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>
+                    </div>
+                </div>
+            </section>
 
-                <article class="feature-card">
-                    <div class="icon-wrapper">
-                        <i class="ph-bold ph-link-simple"></i>
-                    </div>
-                    <h3>ValeoHook Support</h3>
-                    <p>Built-in dynamic linking layer designed explicitly for ValeoHook integration, giving you flawless memory hooks right out of the box.</p>
-                </article>
+            <section class="features-section" id="features">
+                <h2 class="section-title">Engineered for Performance</h2>
+                <div class="features-grid">
+                    <article class="feature-card">
+                        <div class="icon-wrapper">
+                            <i class="ph-bold ph-lightning"></i>
+                        </div>
+                        <h3>Fast Loading</h3>
+                        <p>Efficiently handles multi-threaded scripting states to achieve lightning-fast executions with minimal baseline memory footprint.</p>
+                    </article>
+                    <article class="feature-card">
+                        <div class="icon-wrapper">
+                            <i class="ph-bold ph-link-simple"></i>
+                        </div>
+                        <h3>ValeoHook Support</h3>
+                        <p>Built-in dynamic linking layer designed explicitly for ValeoHook integration, giving you flawless memory hooks right out of the box.</p>
+                    </article>
+                    <article class="feature-card">
+                        <div class="icon-wrapper">
+                            <i class="ph-bold ph-feather"></i>
+                        </div>
+                        <h3>Ultra Lightweight</h3>
+                        <p>Zero bloat philosophy. Standard integration patterns use native architecture handles without forcing heavy external dependencies.</p>
+                    </article>
+                    <article class="feature-card">
+                        <div class="icon-wrapper">
+                            <i class="ph-bold ph-code"></i>
+                        </div>
+                        <h3>Developer First API</h3>
+                        <p>Simple, well-documented initialization sequences mean you spend less time configuring boilerplate and more time writing logic.</p>
+                    </article>
+                </div>
+            </section>
+        </div>
 
-                <article class="feature-card">
-                    <div class="icon-wrapper">
-                        <i class="ph-bold ph-feather"></i>
+        <div id="pageMaker" class="page-view">
+            <section class="hero" aria-label="Script Converter Engine">
+                <div class="badge">
+                    <i class="ph-fill ph-cpu"></i> Automated URL Parser
+                </div>
+                <h1>Felix Loadstring Maker</h1>
+                <p>Convert your remote GitHub URLs or Pastebin links instantly into clean, production-optimized environment execution loadstrings.</p>
+                
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="scriptUrl">Paste Remote Script Address</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-link"></i>
+                            <input type="url" id="scriptUrl" class="form-input" placeholder="https://github.com/... or https://pastebin.com/..." oninput="processUrlChange()">
+                        </div>
                     </div>
-                    <h3>Ultra Lightweight</h3>
-                    <p>Zero bloat philosophy. Standard integration patterns use native architecture handles without forcing heavy external dependencies.</p>
-                </article>
+                </div>
 
-                <article class="feature-card">
-                    <div class="icon-wrapper">
-                        <i class="ph-bold ph-code"></i>
+                <div class="preview-window">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                            <span class="window-title" style="margin-left: 0.85rem;">dynamic_output.lua</span>
+                        </div>
+                        <button class="btn-github" id="makerCopyBtn" onclick="copyGeneratedLoadstring()" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                            <i class="ph ph-copy"></i> Copy Loadstring
+                        </button>
                     </div>
-                    <h3>Developer First API</h3>
-                    <p>Simple, well-documented initialization sequences mean you spend less time configuring boilerplate and more time writing logic.</p>
-                </article>
-            </div>
-        </section>
+                    <div class="window-body" id="generatedOutputWrapper" onclick="copyGeneratedLoadstring()" title="Click to copy generated string">
+                        <code id="outputCode"><span style="color: #475569;">-- Dynamic output configuration will populate here automatically...</span></code>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
     <footer>
@@ -498,28 +605,106 @@
     </footer>
 
     <script>
-        function copyLoadstring() {
+        // Single-Page View Navigation Routine
+        function switchPage(pageId) {
+            document.getElementById('pageHome').classList.remove('active-view');
+            document.getElementById('pageMaker').classList.remove('active-view');
+            document.getElementById('navHome').classList.remove('active');
+            document.getElementById('navMaker').classList.remove('active');
+
+            if(pageId === 'home') {
+                document.getElementById('pageHome').classList.add('active-view');
+                document.getElementById('navHome').classList.add('active');
+            } else if(pageId === 'maker') {
+                document.getElementById('pageMaker').classList.add('active-view');
+                document.getElementById('navMaker').classList.add('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // Static Page Clipboard Handler
+        function copyStaticLoadstring() {
             const loadstringText = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/XPY-UX/felix-luaLoader/refs/heads/main/main/refs/loader.luau/loader.lua",true))()';
+            executeClipboardAction(loadstringText, 'copyBtn', 'btnText', 'btnIcon');
+        }
+
+        // URL Processing Core Logic 
+        let cleanRawOutputString = "";
+
+        function processUrlChange() {
+            let inputUrl = document.getElementById('scriptUrl').value.trim();
+            const outputElement = document.getElementById('outputCode');
             
-            navigator.clipboard.writeText(loadstringText).then(() => {
-                const copyBtn = document.getElementById('copyBtn');
-                const btnText = document.getElementById('btnText');
-                const btnIcon = document.getElementById('btnIcon');
+            if (!inputUrl) {
+                outputElement.innerHTML = `<span style="color: #475569;">-- Dynamic output configuration will populate here automatically...</span>`;
+                cleanRawOutputString = "";
+                return;
+            }
 
-                copyBtn.classList.add('copied');
-                btnText.innerText = 'Copied Code!';
-                btnIcon.className = 'ph-bold ph-check';
+            // Transform dynamic link properties rulesets
+            try {
+                let parsedUrl = new URL(inputUrl);
 
-                setTimeout(() => {
-                    copyBtn.classList.remove('copied');
-                    btnText.innerText = 'Copy Loadstring';
-                    btnIcon.className = 'ph ph-copy';
-                }, 2000);
+                // Check for GitHub regular repository view links and format to raw
+                if (parsedUrl.hostname === "github.com" && !parsedUrl.pathname.includes("/raw/")) {
+                    parsedUrl.hostname = "raw.githubusercontent.com";
+                    // Remove standard visual '/blob/' directory segment from path matching raw parameters
+                    parsedUrl.pathname = parsedUrl.pathname.replace("/blob/", "/");
+                    inputUrl = parsedUrl.toString();
+                }
+                
+                // Check for standard Pastebin web addresses and format to raw output configuration
+                if (parsedUrl.hostname === "pastebin.com" && !parsedUrl.pathname.startsWith("/raw/")) {
+                    parsedUrl.pathname = "/raw" + parsedUrl.pathname;
+                    inputUrl = parsedUrl.toString();
+                }
+            } catch(e) {
+                // Fail gracefully if address structural components don't match formal URL specs yet
+            }
+
+            // Build structural abstract syntax tokens on client-view layout
+            cleanRawOutputString = `loadstring(game:HttpGet("${inputUrl}",true))()`;
+            
+            outputElement.innerHTML = `<code><span class="token keyword">loadstring</span><span class="token punctuation">(</span><span class="token method">game</span><span class="token punctuation">:</span><span class="token method">HttpGet</span><span class="token punctuation">(</span><span class="token string">"${inputUrl}"</span><span class="token punctuation">,</span><span class="token keyword">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>`;
+        }
+
+        // Dynamic Generator Page Clipboard Handler
+        function copyGeneratedLoadstring() {
+            if (!cleanRawOutputString) return;
+            executeClipboardAction(cleanRawOutputString, 'makerCopyBtn', null, null);
+        }
+
+        // Centralized Utility Execution Engine
+        function executeClipboardAction(textStr, buttonId, textId, iconId) {
+            navigator.clipboard.writeText(textStr).then(() => {
+                const actionButton = document.getElementById(buttonId);
+                const originalBg = actionButton.style.background;
+                
+                // Toggle state presentation layers
+                if(textId && iconId) {
+                    const labelText = document.getElementById(textId);
+                    const visualIcon = document.getElementById(iconId);
+                    actionButton.classList.add('copied');
+                    labelText.innerText = 'Copied Code!';
+                    visualIcon.className = 'ph-bold ph-check';
+
+                    setTimeout(() => {
+                        actionButton.classList.remove('copied');
+                        labelText.innerText = buttonId === 'copyBtn' ? 'Copy Loadstring' : 'Copy Loadstring';
+                        visualIcon.className = 'ph ph-copy';
+                    }, 2000);
+                } else {
+                    // Alternative layout compact feedback state loop handling
+                    const originalHTML = actionButton.innerHTML;
+                    actionButton.innerHTML = `<i class="ph-bold ph-check" style="color:#10b981;"></i> Copied!`;
+                    setTimeout(() => {
+                        actionButton.innerHTML = originalHTML;
+                    }, 2000);
+                }
             }).catch(err => {
-                console.error('Failed to copy code: ', err);
+                console.error('Failed to copy code pipeline parameters: ', err);
             });
         }
     </script>
-
 </body>
 </html>
