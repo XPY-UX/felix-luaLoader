@@ -1,22 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="scroll-behavior: smooth;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Felix Lua Loader — Fast & Simple Script Loading</title>
+    
+    <meta name="description" content="Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.">
+    <meta name="theme-color" content="#3b82f6">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Felix Lua Loader">
+    <meta property="og:description" content="Fast, lightweight, and simple Lua execution layer featuring native ValeoHook integration.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
     <style>
         :root {
-            --bg-main: #0a0a0c;
-            --bg-card: #121215;
-            --bg-code: #16161a;
-            --border: #232329;
+            --bg-main: #060608;
+            --bg-card: #0d0d11;
+            --bg-code: #13131a;
+            --border: #1f1f27;
             --text-main: #f4f4f5;
             --text-muted: #a1a1aa;
             --accent: #3b82f6;
             --accent-hover: #2563eb;
-            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-glow: rgba(59, 130, 246, 0.12);
             --success: #10b981;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
         }
 
         * {
@@ -25,36 +38,62 @@
             padding: 0;
         }
 
+        /* Next-Level Dark Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2e2e38;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: var(--font-sans);
             background-color: var(--bg-main);
             color: var(--text-main);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        /* Navigation */
+        /* Header Navigation */
+        header {
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(6, 6, 8, 0.7);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 2rem;
             max-width: 1200px;
             margin: 0 auto;
-            border-bottom: 1px solid var(--border);
         }
 
         .logo {
             font-weight: 700;
             font-size: 1.25rem;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
         }
 
         .logo i {
             color: var(--accent);
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
         }
 
         .nav-links {
@@ -68,7 +107,8 @@
             color: var(--text-muted);
             text-decoration: none;
             font-size: 0.9rem;
-            transition: color 0.2s;
+            font-weight: 500;
+            transition: color 0.2s ease;
         }
 
         .nav-links a:hover {
@@ -80,108 +120,141 @@
             border: 1px solid var(--border);
             color: var(--text-main);
             padding: 0.5rem 1rem;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 500;
+            font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             cursor: pointer;
             text-decoration: none;
-            transition: background-color 0.2s, border-color 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-github:hover {
             background-color: var(--border);
-            border-color: var(--text-muted);
+            border-color: #3f3f46;
+            transform: translateY(-1px);
         }
 
         /* Hero Section */
         .hero {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 6rem 2rem 4rem 2rem;
+            padding: 7rem 2rem 5rem 2rem;
             text-align: center;
             position: relative;
         }
 
+        /* Subtle Background Ambient Radial Glow */
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
         .badge {
             background: var(--accent-glow);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.25);
             color: #60a5fa;
-            padding: 0.35rem 0.75rem;
+            padding: 0.4rem 0.85rem;
             border-radius: 9999px;
             font-size: 0.8rem;
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: 0.02em;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 800;
-            letter-spacing: -0.06em;
+            letter-spacing: -0.05em;
             line-height: 1.1;
             margin-bottom: 1.5rem;
-            background: linear-gradient(to bottom right, #ffffff, #a1a1aa);
+            background: linear-gradient(to bottom, #ffffff 60%, #a1a1aa 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto 2.5rem auto;
+            max-width: 640px;
+            margin: 0 auto 3rem auto;
         }
 
         .cta-group {
             display: flex;
             gap: 1rem;
             justify-content: center;
-            margin-bottom: 4rem;
+            margin-bottom: 5rem;
         }
 
         .btn-primary {
             background-color: var(--accent);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            font-weight: 500;
+            padding: 0.75rem 1.75rem;
+            border-radius: 8px;
+            font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            transition: background-color 0.2s, transform 0.1s;
+            gap: 0.6rem;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-primary:hover {
             background-color: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
 
         .btn-primary.copied {
             background-color: var(--success);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
         }
 
-        /* Code/Preview Window */
+        /* Interactive Code Preview Window */
         .preview-window {
             background-color: var(--bg-code);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 12px;
             max-width: 850px;
             margin: 0 auto;
             text-align: left;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
             overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .preview-window:hover {
+            border-color: #2e2e3b;
         }
 
         .window-header {
             background-color: var(--bg-card);
-            padding: 0.75rem 1rem;
+            padding: 0.85rem 1.25rem;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .window-controls {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -191,190 +264,224 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background-color: #333;
         }
-        .dot.red { background-color: #ef4444; }
-        .dot.yellow { background-color: #f59e0b; }
+        .dot.red { background-color: #f43f5e; }
+        .dot.yellow { background-color: #eab308; }
         .dot.green { background-color: #10b981; }
 
         .window-title {
             font-size: 0.8rem;
             color: var(--text-muted);
-            margin-left: 1rem;
-            font-family: monospace;
+            font-family: var(--font-mono);
+        }
+
+        .window-action-tip {
+            font-size: 0.75rem;
+            color: #4b5563;
+            font-family: var(--font-mono);
         }
 
         .window-body {
-            padding: 1.5rem;
-            font-family: 'Courier New', Courier, monospace;
+            padding: 1.75rem;
+            font-family: var(--font-mono);
             font-size: 0.9rem;
-            color: #f43f5e; /* Default string/method colors */
             overflow-x: auto;
             white-space: nowrap;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--bg-code) 0%, #111116 100%);
         }
 
-        .window-body .keyword { color: #f43f5e; }
-        .window-body .method { color: #a78bfa; }
-        .window-body .string { color: #10b981; }
+        .window-body code {
+            user-select: all; /* Easy raw highlight fallback */
+        }
+
+        /* Code Syntax Tokens */
+        .token.keyword { color: #f43f5e; font-weight: 500; }
+        .token.method { color: #a78bfa; }
+        .token.string { color: #34d399; }
+        .token.punctuation { color: #9ca3af; }
 
         /* Features Section */
         .features-section {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 6rem 2rem;
+            padding: 7rem 2rem;
             border-top: 1px solid var(--border);
         }
 
         .section-title {
             text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 2.25rem;
+            font-weight: 800;
             letter-spacing: -0.04em;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.75rem;
         }
 
         .feature-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border);
-            padding: 2rem;
-            border-radius: 8px;
-            transition: transform 0.2s, border-color 0.2s;
+            padding: 2.25rem;
+            border-radius: 12px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .feature-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
+            border-color: #3b82f6;
+            background-color: #121218;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
         }
 
         .icon-wrapper {
-            background-color: var(--bg-main);
+            background-color: rgba(59, 130, 246, 0.05);
             border: 1px solid var(--border);
-            width: 44px;
-            height: 44px;
-            border-radius: 6px;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
             color: var(--accent);
-            font-size: 1.25rem;
+            font-size: 1.35rem;
+            transition: all 0.25s ease;
+        }
+
+        .feature-card:hover .icon-wrapper {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
         }
 
         .feature-card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.02em;
         }
 
         .feature-card p {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             line-height: 1.6;
         }
 
         /* Footer */
         footer {
             text-align: center;
-            padding: 3rem 2rem;
+            padding: 4rem 2rem;
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             border-top: 1px solid var(--border);
+            background-color: #040406;
         }
 
+        /* Responsive Breakpoints */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
+            .hero h1 { font-size: 2.75rem; }
+            .hero p { font-size: 1.1rem; }
             .nav-links { display: none; }
+            .hero { padding-top: 4rem; }
+            .window-action-tip { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">
-            <i class="ph-bold ph-terminal-window"></i> Felix Lua Loader
-        </div>
-        <ul class="nav-links">
-            <li><a href="#features">Features</a></li>
-            <li>
+    <header>
+        <nav aria-label="Global Directory">
+            <div class="logo">
+                <i class="ph-bold ph-terminal-window"></i> Felix Lua Loader
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li>
+                    <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github" aria-label="Felix Lua Loader Repository on GitHub">
+                        <i class="ph ph-github-logo"></i> GitHub
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" aria-label="Product Showcase">
+            <div class="badge">
+                <i class="ph-fill ph-sparkle"></i> ValeoHook Integration Ready
+            </div>
+            <h1>Fast & Simple Lua Script Loader</h1>
+            <p>Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.</p>
+            
+            <div class="cta-group">
+                <button class="btn-primary" id="copyBtn" onclick="copyLoadstring()" aria-live="polite">
+                    <i class="ph ph-copy" id="btnIcon"></i> <span id="btnText">Copy Loadstring</span>
+                </button>
                 <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github">
-                    <i class="ph ph-github-logo"></i> GitHub
+                    <i class="ph ph-book-open"></i> Documentation
                 </a>
-            </li>
-        </ul>
-    </nav>
-
-    <section class="hero">
-        <div class="badge">
-            <i class="ph-fill ph-sparkle"></i> ValeoHook Integration Ready
-        </div>
-        <h1>Fast & Simple Lua Script Loader</h1>
-        <p>Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.</p>
-        
-        <div class="cta-group">
-            <button class="btn-primary" id="copyBtn" onclick="copyLoadstring()">
-                <i class="ph ph-copy" id="btnIcon"></i> <span id="btnText">Copy Loadstring</span>
-            </button>
-            <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github">
-                <i class="ph ph-book-open"></i> Documentation
-            </a>
-        </div>
-
-        <div class="preview-window">
-            <div class="window-header">
-                <div class="dot red"></div>
-                <div class="dot yellow"></div>
-                <div class="dot green"></div>
-                <div class="window-title">environment_exec.lua</div>
             </div>
-            <div class="window-body">
-                <span class="keyword">loadstring</span>(<span class="method">game</span>:<span class="method">HttpGet</span>(<span class="string">"https://raw.githubusercontent.com/XPY-UX/felix-luaLoader/refs/heads/main/main/refs/loader.luau/loader.lua"</span>,<span class="keyword">true</span>))()
-            </div>
-        </div>
-    </section>
 
-    <section class="features-section" id="features">
-        <h2 class="section-title">Engineered for Performance</h2>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="icon-wrapper">
-                    <i class="ph-bold ph-lightning"></i>
+            <div class="preview-window">
+                <div class="window-header">
+                    <div class="window-controls">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                        <span class="window-title" style="margin-left: 0.75rem;">environment_exec.lua</span>
+                    </div>
+                    <span class="window-action-tip"><i class="ph ph-cursor-click"></i> Click block to copy</span>
                 </div>
-                <h3>Fast Loading</h3>
-                <p>Efficiently handles multi-threaded scripting states to achieve lightning-fast executions with minimal baseline memory footprint.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="icon-wrapper">
-                    <i class="ph-bold ph-link-simple"></i>
+                <div class="window-body" id="codeBlock" onclick="copyLoadstring()" title="Click to copy script">
+                    <code><span class="token keyword">loadstring</span><span class="token punctuation">(</span><span class="token method">game</span><span class="token punctuation">:</span><span class="token method">HttpGet</span><span class="token punctuation">(</span><span class="token string">"https://raw.githubusercontent.com/XPY-UX/felix-luaLoader/refs/heads/main/main/refs/loader.luau/loader.lua"</span><span class="token punctuation">,</span><span class="token keyword">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>
                 </div>
-                <h3>ValeoHook Support</h3>
-                <p>Built-in dynamic linking layer designed explicitly for ValeoHook integration, giving you flawless memory hooks right out of the box.</p>
             </div>
+        </section>
 
-            <div class="feature-card">
-                <div class="icon-wrapper">
-                    <i class="ph-bold ph-feather"></i>
-                </div>
-                <h3>Ultra Lightweight</h3>
-                <p>Zero bloat philosophy. Standard integration patterns use native architecture handles without forcing heavy external dependencies.</p>
-            </div>
+        <section class="features-section" id="features" aria-labelledby="features-heading">
+            <h2 class="section-title" id="features-heading">Engineered for Performance</h2>
+            
+            <div class="features-grid">
+                <article class="feature-card">
+                    <div class="icon-wrapper">
+                        <i class="ph-bold ph-lightning"></i>
+                    </div>
+                    <h3>Fast Loading</h3>
+                    <p>Efficiently handles multi-threaded scripting states to achieve lightning-fast executions with minimal baseline memory footprint.</p>
+                </article>
 
-            <div class="feature-card">
-                <div class="icon-wrapper">
-                    <i class="ph-bold ph-code"></i>
-                </div>
-                <h3>Developer First API</h3>
-                <p>Simple, well-documented initialization sequences mean you spend less time configuring boilerplate and more time writing logic.</p>
+                <article class="feature-card">
+                    <div class="icon-wrapper">
+                        <i class="ph-bold ph-link-simple"></i>
+                    </div>
+                    <h3>ValeoHook Support</h3>
+                    <p>Built-in dynamic linking layer designed explicitly for ValeoHook integration, giving you flawless memory hooks right out of the box.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="icon-wrapper">
+                        <i class="ph-bold ph-feather"></i>
+                    </div>
+                    <h3>Ultra Lightweight</h3>
+                    <p>Zero bloat philosophy. Standard integration patterns use native architecture handles without forcing heavy external dependencies.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="icon-wrapper">
+                        <i class="ph-bold ph-code"></i>
+                    </div>
+                    <h3>Developer First API</h3>
+                    <p>Simple, well-documented initialization sequences mean you spend less time configuring boilerplate and more time writing logic.</p>
+                </article>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <footer>
         <p>&copy; 2026 Felix Lua Loader. Released under the MIT License.</p>
@@ -389,12 +496,11 @@
                 const btnText = document.getElementById('btnText');
                 const btnIcon = document.getElementById('btnIcon');
 
-                // Visual updates on success
+                // Instant hardware micro-interaction feedback
                 copyBtn.classList.add('copied');
-                btnText.innerText = 'Copied!';
+                btnText.innerText = 'Copied Code!';
                 btnIcon.className = 'ph-bold ph-check';
 
-                // Reset back to original state after 2 seconds
                 setTimeout(() => {
                     copyBtn.classList.remove('copied');
                     btnText.innerText = 'Copy Loadstring';
