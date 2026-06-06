@@ -4,9 +4,9 @@
 </a>
 
 
-```markdown
 <div align="center">
-  <a href="https://valeolua.vercel.app">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=5C6BC0&background=0D1117&center=true&vCenter=true&width=600&height=70&lines=🌙+ValeoLua;Click+to+explore+our+platform...;valeolua.vercel.app" alt="ValeoLua Website" />
-  </a>
+
+[![Website](https://img.shields.io/website?label=valeolua.vercel.app&up_color=007ACC&up_message=online&url=https%3A%2F%2Fvaleolua.vercel.app&style=for-the-badge&logo=lua&logoColor=5c6bc0)](https://valeolua.vercel.app)
+[![Explore](https://img.shields.io/badge/Explore-Live_Demo-cyan?style=for-the-badge&logo=vercel&logoColor=white)](https://valeolua.vercel.app)
+
 </div>
