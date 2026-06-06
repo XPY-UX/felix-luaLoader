@@ -4,7 +4,9 @@
 </a>
 
 
-```lua
--- Visit the official ValeoLua website
-local valeoLua = require("valeolua")
-valeoLua.open_website("[https://valeolua.vercel.app](https://valeolua.vercel.app)")
+```markdown
+<div align="center">
+  <a href="https://valeolua.vercel.app">
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=5C6BC0&background=0D1117&center=true&vCenter=true&width=600&height=70&lines=🌙+ValeoLua;Click+to+explore+our+platform...;valeolua.vercel.app" alt="ValeoLua Website" />
+  </a>
+</div>
