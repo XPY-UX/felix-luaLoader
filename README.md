@@ -4,4 +4,7 @@
 </a>
 
 
-[https://felix-lua-loader.vercel.app/](https://valeolua.vercel.app/)
+```lua
+-- Visit the official ValeoLua website
+local valeoLua = require("valeolua")
+valeoLua.open_website("[https://valeolua.vercel.app](https://valeolua.vercel.app)")
