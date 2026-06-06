@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Felix Lua Loader — Fast & Simple Script Loading</title>
+    <title>Valeo Lua Loader — Fast & Simple Script Loading</title>
     
-    <meta name="description" content="Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.">
+    <meta name="description" content="Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations using Valeo.">
     <meta name="theme-color" content="#3b82f6">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Felix Lua Loader">
-    <meta property="og:description" content="Fast, lightweight, and simple Lua execution layer featuring native ValeoHook integration.">
+    <meta property="og:title" content="Valeo Lua Loader">
+    <meta property="og:description" content="Fast, lightweight, and simple Lua execution layer featuring native Valeo architecture integration.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -479,11 +479,11 @@
     <header>
         <nav aria-label="Global Directory">
             <div class="logo">
-                <i class="ph-bold ph-terminal-window"></i> Felix Lua Loader
+                <i class="ph-bold ph-terminal-window"></i> Valeo Lua Loader
             </div>
             <ul class="nav-links">
                 <li><button id="navHome" class="active" onclick="switchPage('home')">Home</button></li>
-                <li><button id="navMaker" onclick="switchPage('maker')">Loadstring Maker</button></li>
+                <li><button id="navMaker" onclick="switchPage('maker')">Valeo Loadstring Maker</button></li>
                 <li>
                     <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github" aria-label="GitHub Repository">
                         <i class="ph ph-github-logo"></i> GitHub
@@ -497,9 +497,9 @@
         <div id="pageHome" class="page-view active-view">
             <section class="hero" aria-label="Product Showcase">
                 <div class="badge">
-                    <i class="ph-fill ph-sparkle"></i> ValeoHook Integration Ready
+                    <i class="ph-fill ph-sparkle"></i> Valeo Architecture Integrated
                 </div>
-                <h1>Fast & Simple Lua Script Loader</h1>
+                <h1>Fast & Simple Valeo Script Loader</h1>
                 <p>Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.</p>
                 
                 <div class="cta-group">
@@ -517,7 +517,7 @@
                             <div class="dot red"></div>
                             <div class="dot yellow"></div>
                             <div class="dot green"></div>
-                            <span class="window-title" style="margin-left: 0.85rem;">environment_exec.lua</span>
+                            <span class="window-title" style="margin-left: 0.85rem;">valeo_exec.lua</span>
                         </div>
                         <span class="window-action-tip"><i class="ph ph-cursor-click"></i> Click block to copy</span>
                     </div>
@@ -541,8 +541,8 @@
                         <div class="icon-wrapper">
                             <i class="ph-bold ph-link-simple"></i>
                         </div>
-                        <h3>ValeoHook Support</h3>
-                        <p>Built-in dynamic linking layer designed explicitly for ValeoHook integration, giving you flawless memory hooks right out of the box.</p>
+                        <h3>Native Support</h3>
+                        <p>Built-in dynamic linking layer designed explicitly for Valeo integration, giving you flawless memory hooks right out of the box.</p>
                     </article>
                     <article class="feature-card">
                         <div class="icon-wrapper">
@@ -567,7 +567,7 @@
                 <div class="badge">
                     <i class="ph-fill ph-cpu"></i> Automated URL Parser
                 </div>
-                <h1>Felix Loadstring Maker</h1>
+                <h1>Valeo Loadstring Maker</h1>
                 <p>Convert your remote GitHub URLs or Pastebin links instantly into clean, production-optimized environment execution loadstrings.</p>
                 
                 <div class="form-container">
@@ -586,7 +586,7 @@
                             <div class="dot red"></div>
                             <div class="dot yellow"></div>
                             <div class="dot green"></div>
-                            <span class="window-title" style="margin-left: 0.85rem;">dynamic_output.lua</span>
+                            <span class="window-title" style="margin-left: 0.85rem;">valeo_output.lua</span>
                         </div>
                         <button class="btn-github" id="makerCopyBtn" onclick="copyGeneratedLoadstring()" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
                             <i class="ph ph-copy"></i> Copy Loadstring
@@ -601,7 +601,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 Felix Lua Loader. Released under the MIT License.</p>
+        <p>&copy; 2026 Valeo Lua Loader. Released under the MIT License.</p>
     </footer>
 
     <script>
@@ -648,7 +648,6 @@
                 // Check for GitHub regular repository view links and format to raw
                 if (parsedUrl.hostname === "github.com" && !parsedUrl.pathname.includes("/raw/")) {
                     parsedUrl.hostname = "raw.githubusercontent.com";
-                    // Remove standard visual '/blob/' directory segment from path matching raw parameters
                     parsedUrl.pathname = parsedUrl.pathname.replace("/blob/", "/");
                     inputUrl = parsedUrl.toString();
                 }
@@ -678,7 +677,6 @@
         function executeClipboardAction(textStr, buttonId, textId, iconId) {
             navigator.clipboard.writeText(textStr).then(() => {
                 const actionButton = document.getElementById(buttonId);
-                const originalBg = actionButton.style.background;
                 
                 // Toggle state presentation layers
                 if(textId && iconId) {
@@ -690,7 +688,7 @@
 
                     setTimeout(() => {
                         actionButton.classList.remove('copied');
-                        labelText.innerText = buttonId === 'copyBtn' ? 'Copy Loadstring' : 'Copy Loadstring';
+                        labelText.innerText = 'Copy Loadstring';
                         visualIcon.className = 'ph ph-copy';
                     }, 2000);
                 } else {
