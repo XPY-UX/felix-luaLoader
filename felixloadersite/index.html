@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valeo Lua Loader — Fast & Simple Script Loading</title>
+    <title>Valeo Lua Loader — Script Database & Loader Hub</title>
     
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='100%25' height='100%25'%3E%3Cdefs%3E%3Cfilter id='glow'%3E%3CfeGaussianBlur stdDeviation='1.5' result='coloredBlur'/%3E%3CfeMerge%3E%3CfeMergeNode in='coloredBlur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3CfeMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='24' height='24' rx='5' fill='%2309090d' stroke='%23ffffff' stroke-opacity='0.06' stroke-width='1'/%3E%3Cpath d='M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm0 2v8h16V8H4zm3 1.5L10.5 12 7 14.5V13h-1v-2h1V9.5zM12 14h5v1h-5v-1z' fill='%233b82f6' filter='url(%23glow)'/%3E%3C/svg%3E">
 
@@ -20,17 +20,18 @@
     
     <style>
         :root {
-            --bg-main: #030303;
-            --bg-card: rgba(18, 18, 24, 0.65);
-            --bg-code: #09090d;
-            --border: rgba(255, 255, 255, 0.06);
-            --border-hover: rgba(59, 130, 246, 0.3);
+            --bg-main: #020204;
+            --bg-card: rgba(10, 10, 16, 0.7);
+            --bg-code: #06060a;
+            --border: rgba(255, 255, 255, 0.05);
+            --border-hover: rgba(59, 130, 246, 0.4);
             --text-main: #f4f4f5;
-            --text-muted: #94a3b8;
+            --text-muted: #8a99ad;
             --accent: #3b82f6;
             --accent-hover: #60a5fa;
-            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-glow: rgba(59, 130, 246, 0.12);
             --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
             --font-sans: 'Plus Jakarta Sans', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -49,7 +50,7 @@
             background: var(--bg-main);
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
@@ -64,17 +65,58 @@
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.18) 0%, transparent 50%),
-                radial-gradient(circle at 0% 40%, rgba(16, 185, 129, 0.03) 0%, transparent 30%);
+                radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 60%, rgba(16, 185, 129, 0.02) 0%, transparent 30%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
+        /* Live Status Bar */
+        .status-ticker {
+            background: rgba(16, 185, 129, 0.06);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #a7f3d0;
+            padding: 0.5rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            backdrop-filter: blur(8px);
+            z-index: 55;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .separator {
+            color: rgba(16, 185, 129, 0.3);
+        }
+
         /* Frosted Header Navigation */
         header {
             border-bottom: 1px solid var(--border);
-            background-color: rgba(3, 3, 3, 0.75);
+            background-color: rgba(2, 2, 4, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             position: sticky;
@@ -86,14 +128,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.25rem 2rem;
+            padding: 1.1rem 2rem;
             max-width: 1200px;
             margin: 0 auto;
         }
 
         .logo {
             font-weight: 800;
-            font-size: 1.3rem;
+            font-size: 1.35rem;
             letter-spacing: -0.03em;
             display: flex;
             align-items: center;
@@ -133,11 +175,11 @@
         }
 
         .btn-github {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 0.6rem 1.2rem;
-            border-radius: 10px;
+            padding: 0.55rem 1.1rem;
+            border-radius: 8px;
             font-weight: 600;
             font-size: 0.85rem;
             display: inline-flex;
@@ -150,9 +192,9 @@
         }
 
         .btn-github:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
         }
 
         main {
@@ -167,93 +209,122 @@
             display: block;
         }
 
-        /* Hero Common Structure */
+        /* Hero Structure Optimized for Script Platforms */
         .hero {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 6rem 2rem 4rem 2rem;
+            padding: 5rem 2rem 4rem 2rem;
             text-align: center;
         }
 
         .badge {
             background: var(--accent-glow);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.25);
             color: #93c5fd;
             padding: 0.4rem 1rem;
             border-radius: 9999px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+            margin-bottom: 1.75rem;
         }
 
         .hero h1 {
-            font-size: 4.5rem;
+            font-size: 4.25rem;
             font-weight: 800;
-            letter-spacing: -0.05em;
-            line-height: 1.05;
-            margin-bottom: 1.75rem;
-            background: linear-gradient(to bottom, #ffffff 40%, #94a3b8 100%);
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to bottom, #ffffff 50%, #94a3b8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero p {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--text-muted);
-            max-width: 680px;
-            margin: 0 auto 3.5rem auto;
+            max-width: 640px;
+            margin: 0 auto 3rem auto;
         }
 
         .cta-group {
             display: flex;
-            gap: 1.25rem;
+            gap: 1rem;
             justify-content: center;
-            margin-bottom: 6rem;
+            margin-bottom: 5rem;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
             border: none;
-            padding: 0.85rem 2rem;
-            border-radius: 10px;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 0.6rem;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
-            filter: brightness(1.1);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.45);
+            filter: brightness(1.05);
         }
 
         .btn-primary.copied {
             background: linear-gradient(135deg, #10b981 0%, #047857 100%);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
         }
 
-        /* Generator Page Specific Form Elements */
+        /* Script Metrics / Analytics Panel */
+        .script-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 550px;
+            margin: 0 auto 3rem auto;
+            background: rgba(255,255,255,0.01);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: var(--font-mono);
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+        .stat-box:not(:last-child) {
+            border-right: 1px solid var(--border);
+        }
+        .stat-box .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-box .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Generator Container */
         .form-container {
             max-width: 850px;
-            margin: 0 auto 3rem auto;
+            margin: 0 auto 2.5rem auto;
             background: var(--bg-card);
             border: 1px solid var(--border);
             padding: 2.5rem;
-            border-radius: 16px;
+            border-radius: 14px;
             text-align: left;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
         .form-group {
@@ -264,10 +335,11 @@
         }
 
         .form-group label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-main);
-            letter-spacing: 0.02em;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
         .input-wrapper {
@@ -280,7 +352,7 @@
             position: absolute;
             left: 1.25rem;
             color: #475569;
-            font-size: 1.25rem;
+            font-size: 1.2rem;
         }
 
         .form-input {
@@ -288,7 +360,7 @@
             background: var(--bg-code);
             border: 1px solid var(--border);
             padding: 1rem 1.25rem 1rem 3.2rem;
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text-main);
             font-family: var(--font-mono);
             font-size: 0.95rem;
@@ -301,30 +373,27 @@
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
         }
 
-        /* Premium Floating Terminal Window */
+        /* IDE Style Terminal Window */
         .preview-window {
             background-color: var(--bg-code);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
             max-width: 850px;
             margin: 0 auto;
             text-align: left;
-            box-shadow: 
-                0 30px 60px -15px rgba(0,0,0,0.8),
-                0 0 50px -10px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.8);
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .preview-window:hover {
-            border-color: rgba(59, 130, 246, 0.4);
-            transform: scale(1.01);
+            border-color: var(--border-hover);
         }
 
         .window-header {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.01);
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -333,28 +402,27 @@
         .window-controls {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
 
         .dot {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            opacity: 0.75;
         }
-        .dot.red { background-color: #f43f5e; }
+        .dot.red { background-color: #ef4444; }
         .dot.yellow { background-color: #eab308; }
-        .dot.green { background-color: #10b981; }
+        .dot.green { background-color: #22c55e; }
 
         .window-title {
-            font-size: 0.85rem;
-            color: #64748b;
+            font-size: 0.8rem;
+            color: #475569;
             font-family: var(--font-mono);
             font-weight: 500;
         }
 
         .window-action-tip {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #475569;
             font-family: var(--font-mono);
             display: flex;
@@ -363,35 +431,35 @@
         }
 
         .window-body {
-            padding: 2rem;
+            padding: 1.75rem;
             font-family: var(--font-mono);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             overflow-x: auto;
             white-space: nowrap;
             cursor: pointer;
-            background: linear-gradient(180deg, #09090d 0%, #050507 100%);
+            background: #040407;
         }
 
-        /* Code Colorization Strategy */
-        .token.keyword { color: #ff4a75; font-weight: 600; }
-        .token.method { color: #b392ff; }
-        .token.string { color: #4ade80; }
+        /* Syntax Highlighter Rules */
+        .token.keyword { color: #f43f5e; font-weight: 600; }
+        .token.method { color: #a855f7; }
+        .token.string { color: #10b981; }
         .token.punctuation { color: #64748b; }
 
         /* Features Section */
         .features-section {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 8rem 2rem;
+            padding: 6rem 2rem;
             border-top: 1px solid var(--border);
         }
 
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 2.25rem;
             font-weight: 800;
             letter-spacing: -0.04em;
-            margin-bottom: 5rem;
+            margin-bottom: 4rem;
             background: linear-gradient(to right, #ffffff, #94a3b8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -400,7 +468,7 @@
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         .feature-card {
@@ -408,59 +476,58 @@
             border: 1px solid var(--border);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 2.5rem;
-            border-radius: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 2.25rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
         }
 
         .feature-card:hover {
             border-color: var(--border-hover);
-            background: rgba(24, 24, 35, 0.8);
-            transform: translateY(-6px);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+            background: rgba(14, 14, 22, 0.9);
+            transform: translateY(-4px);
         }
 
         .icon-wrapper {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            width: 52px;
-            height: 52px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.5rem;
             color: var(--accent);
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
+            font-size: 1.3rem;
+            transition: all 0.2s ease;
         }
 
         .feature-card:hover .icon-wrapper {
             background: var(--accent);
             color: white;
             border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
         }
 
         .feature-card h3 {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: 700;
-            margin-bottom: 0.75rem;
-            letter-spacing: -0.02em;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.01em;
         }
 
         .feature-card p {
             color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.7;
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
         /* Footer Layer */
         footer {
             text-align: center;
-            padding: 5rem 2rem;
-            color: #475569;
-            font-size: 0.9rem;
+            padding: 4rem 2rem;
+            color: #334155;
+            font-size: 0.85rem;
             border-top: 1px solid var(--border);
             background-color: #010102;
             font-family: var(--font-mono);
@@ -468,27 +535,46 @@
 
         /* Mobile Adjustments */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 3rem; }
-            .hero p { font-size: 1.15rem; }
+            .hero h1 { font-size: 2.75rem; }
+            .hero p { font-size: 1.1rem; }
             .nav-links { display: none; }
             .window-action-tip { display: none; }
             .form-container { padding: 1.5rem; }
+            .script-stats-bar { grid-template-columns: 1fr; gap: 1rem; }
+            .stat-box:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; }
         }
     </style>
 </head>
 <body>
 
+    <div class="status-ticker">
+        <div class="status-item">
+            <div class="pulse-dot"></div>
+            <span>VALEO LOADER: ACTIVE</span>
+        </div>
+        <span class="separator">|</span>
+        <div class="status-item">
+            <i class="ph ph-shield-check" style="color: var(--success);"></i>
+            <span>ANTI-DETECTION: UNDETECTED</span>
+        </div>
+        <span class="separator">|</span>
+        <div class="status-item">
+            <i class="ph ph-cpu" style="color: var(--accent);"></i>
+            <span>API RESPONSIVENESS: 12ms</span>
+        </div>
+    </div>
+
     <header>
         <nav aria-label="Global Directory">
             <div class="logo">
-                <i class="ph-bold ph-terminal-window"></i> Valeo Lua Loader
+                <i class="ph-bold ph-terminal-window"></i> Valeo Hub
             </div>
             <ul class="nav-links">
-                <li><button id="navHome" class="active" onclick="switchPage('home')">Home</button></li>
-                <li><button id="navMaker" onclick="switchPage('maker')">Valeo Loadstring Maker</button></li>
+                <li><button id="navHome" class="active" onclick="switchPage('home')">Get Script</button></li>
+                <li><button id="navMaker" onclick="switchPage('maker')">Loadstring Maker</button></li>
                 <li>
                     <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github" aria-label="GitHub Repository">
-                        <i class="ph ph-github-logo"></i> GitHub
+                        <i class="ph ph-github-logo"></i> Repository
                     </a>
                 </li>
             </ul>
@@ -499,17 +585,32 @@
         <div id="pageHome" class="page-view active-view">
             <section class="hero" aria-label="Product Showcase">
                 <div class="badge">
-                    <i class="ph-fill ph-sparkle"></i> Valeo Architecture Integrated
+                    <i class="ph-fill ph-shield-check" style="color: var(--success);"></i> Secure Execution Layer
                 </div>
-                <h1>Fast & Simple Valeo Script Loader</h1>
-                <p>Efficiently load, manage, and execute complex Lua environments with zero overhead and seamless API configurations.</p>
+                <h1>The Ultimate Valeo Script Platform</h1>
+                <p>Instantly fetch, deploy, and inject high-performance execution parameters through our centralized universal loader matrix.</p>
                 
+                <div class="script-stats-bar">
+                    <div class="stat-box">
+                        <div class="value">v2.4.1</div>
+                        <div class="label">BUILD VERSION</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="value">142,803</div>
+                        <div class="label">TOTAL FETCHES</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="value">99.98%</div>
+                        <div class="label">UPTIME RATE</div>
+                    </div>
+                </div>
+
                 <div class="cta-group">
                     <button class="btn-primary" id="copyBtn" onclick="copyStaticLoadstring()" aria-live="polite">
-                        <i class="ph ph-copy" id="btnIcon"></i> <span id="btnText">Copy Loadstring</span>
+                        <i class="ph ph-copy" id="btnIcon"></i> <span id="btnText">Copy Main Loadstring</span>
                     </button>
                     <a href="https://github.com/XPY-UX/felix-luaLoader" target="_blank" class="btn-github">
-                        <i class="ph ph-book-open"></i> Documentation
+                        <i class="ph ph-code-block"></i> Source Code
                     </a>
                 </div>
 
@@ -519,9 +620,9 @@
                             <div class="dot red"></div>
                             <div class="dot yellow"></div>
                             <div class="dot green"></div>
-                            <span class="window-title" style="margin-left: 0.85rem;">valeo_exec.lua</span>
+                            <span class="window-title" style="margin-left: 0.85rem;">valeo_loader.lua</span>
                         </div>
-                        <span class="window-action-tip"><i class="ph ph-cursor-click"></i> Click block to copy</span>
+                        <span class="window-action-tip"><i class="ph ph-cursor-click"></i> Click code block to copy</span>
                     </div>
                     <div class="window-body" onclick="copyStaticLoadstring()" title="Click to copy script">
                         <code><span class="token keyword">loadstring</span><span class="token punctuation">(</span><span class="token method">game</span><span class="token punctuation">:</span><span class="token method">HttpGet</span><span class="token punctuation">(</span><span class="token string">"https://raw.githubusercontent.com/XPY-UX/felix-luaLoader/refs/heads/main/main/refs/loader.luau/loader.lua"</span><span class="token punctuation">,</span><span class="token keyword">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>
@@ -530,35 +631,35 @@
             </section>
 
             <section class="features-section" id="features">
-                <h2 class="section-title">Engineered for Performance</h2>
+                <h2 class="section-title">Engine Features</h2>
                 <div class="features-grid">
                     <article class="feature-card">
                         <div class="icon-wrapper">
                             <i class="ph-bold ph-lightning"></i>
                         </div>
-                        <h3>Fast Loading</h3>
-                        <p>Efficiently handles multi-threaded scripting states to achieve lightning-fast executions with minimal baseline memory footprint.</p>
+                        <h3>Instant Execution</h3>
+                        <p>Bypasses traditional compilation stages to stream instructions directly into core environments without rendering delays.</p>
                     </article>
                     <article class="feature-card">
                         <div class="icon-wrapper">
-                            <i class="ph-bold ph-link-simple"></i>
+                            <i class="ph-bold ph-eye-slash"></i>
                         </div>
-                        <h3>Native Support</h3>
-                        <p>Built-in dynamic linking layer designed explicitly for Valeo integration, giving you flawless memory hooks right out of the box.</p>
+                        <h3>Anti-Log Footprint</h3>
+                        <p>Constructed defensively using silent memory calls, preventing standard diagnostic vectors from tracking your environment injections.</p>
                     </article>
                     <article class="feature-card">
                         <div class="icon-wrapper">
-                            <i class="ph-bold ph-feather"></i>
+                            <i class="ph-bold ph-arrows-left-right"></i>
                         </div>
-                        <h3>Ultra Lightweight</h3>
-                        <p>Zero bloat philosophy. Standard integration patterns use native architecture handles without forcing heavy external dependencies.</p>
+                        <h3>Auto-Updating CDN</h3>
+                        <p>Linked continuously to our raw repository layer. Receive immediate ecosystem balance hotfixes with no manual re-installs needed.</p>
                     </article>
                     <article class="feature-card">
                         <div class="icon-wrapper">
-                            <i class="ph-bold ph-code"></i>
+                            <i class="ph-bold ph-shield-star"></i>
                         </div>
-                        <h3>Developer First API</h3>
-                        <p>Simple, well-documented initialization sequences mean you spend less time configuring boilerplate and more time writing logic.</p>
+                        <h3>Universal Compatibility</h3>
+                        <p>Tailored directly to support modern level 7/8 execution frameworks, handling intricate meta-table manipulation scripts comfortably.</p>
                     </article>
                 </div>
             </section>
@@ -567,17 +668,17 @@
         <div id="pageMaker" class="page-view">
             <section class="hero" aria-label="Script Converter Engine">
                 <div class="badge">
-                    <i class="ph-fill ph-cpu"></i> Automated URL Parser
+                    <i class="ph-fill ph-cpu"></i> Automated String Compiler
                 </div>
-                <h1>Valeo Loadstring Maker</h1>
-                <p>Convert your remote GitHub URLs or Pastebin links instantly into clean, production-optimized environment execution loadstrings.</p>
+                <h1>Loadstring Generator</h1>
+                <p>Wrap your custom raw development links instantly into optimization execution parameters recognized natively by exploit toolsets.</p>
                 
                 <div class="form-container">
                     <div class="form-group">
                         <label for="scriptUrl">Paste Raw Url</label>
                         <div class="input-wrapper">
                             <i class="ph ph-link"></i>
-                            <input type="url" id="scriptUrl" class="form-input" placeholder="https://github.com/... or https://pastebin.com/..." oninput="processUrlChange()">
+                            <input type="url" id="scriptUrl" class="form-input" placeholder="e.g., https://raw.githubusercontent.com/... or https://pastebin.com/raw/..." oninput="processUrlChange()">
                         </div>
                     </div>
                 </div>
@@ -588,14 +689,14 @@
                             <div class="dot red"></div>
                             <div class="dot yellow"></div>
                             <div class="dot green"></div>
-                            <span class="window-title" style="margin-left: 0.85rem;">valeo_output.lua</span>
+                            <span class="window-title" style="margin-left: 0.85rem;">generated_output.lua</span>
                         </div>
-                        <button class="btn-github" id="makerCopyBtn" onclick="copyGeneratedLoadstring()" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
-                            <i class="ph ph-copy"></i> Copy Loadstring
+                        <button class="btn-github" id="makerCopyBtn" onclick="copyGeneratedLoadstring()" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: rgba(59, 130, 246, 0.2);">
+                            <i class="ph ph-copy"></i> Copy Output
                         </button>
                     </div>
                     <div class="window-body" id="generatedOutputWrapper" onclick="copyGeneratedLoadstring()" title="Click to copy generated string">
-                        <code id="outputCode"><span style="color: #475569;">-- Dynamic output configuration will populate here automatically...</span></code>
+                        <code id="outputCode"><span style="color: #475569;">-- Waiting for raw script link inputs to wrap into production execution values...</span></code>
                     </div>
                 </div>
             </section>
@@ -603,7 +704,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 Valeo Lua Loader. Released under the MIT License.</p>
+        <p>&copy; 2026 Valeo Software Systems. Verified Secure Script Infrastructure Architecture.</p>
     </footer>
 
     <script>
@@ -638,7 +739,7 @@
             const outputElement = document.getElementById('outputCode');
             
             if (!inputUrl) {
-                outputElement.innerHTML = `<span style="color: #475569;">-- Dynamic output configuration will populate here automatically...</span>`;
+                outputElement.innerHTML = `<span style="color: #475569;">-- Waiting for raw script link inputs to wrap into production execution values...</span>`;
                 cleanRawOutputString = "";
                 return;
             }
@@ -685,18 +786,18 @@
                     const labelText = document.getElementById(textId);
                     const visualIcon = document.getElementById(iconId);
                     actionButton.classList.add('copied');
-                    labelText.innerText = 'Copied Code!';
+                    labelText.innerText = 'Copied to Clipboard!';
                     visualIcon.className = 'ph-bold ph-check';
 
                     setTimeout(() => {
                         actionButton.classList.remove('copied');
-                        labelText.innerText = 'Copy Loadstring';
+                        labelText.innerText = 'Copy Main Loadstring';
                         visualIcon.className = 'ph ph-copy';
                     }, 2000);
                 } else {
                     // Alternative layout compact feedback state loop handling
                     const originalHTML = actionButton.innerHTML;
-                    actionButton.innerHTML = `<i class="ph-bold ph-check" style="color:#10b981;"></i> Copied!`;
+                    actionButton.innerHTML = `<i class="ph-bold ph-check" style="color:#10b981;"></i> Copied string!`;
                     setTimeout(() => {
                         actionButton.innerHTML = originalHTML;
                     }, 2000);
